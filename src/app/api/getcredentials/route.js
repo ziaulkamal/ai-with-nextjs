@@ -5,8 +5,8 @@ const VALIDATION_KEY = process.env.VALIDATION_KEY;
 
 export async function GET(req) {
   try {
-    // Ambil query parameter dari URL
-    const url = new URL(req.url, 'http://localhost');  // Tambahkan base URL jika diperlukan
+    // Ambil query parameter dari URL 
+    const url = new URL(req.url, process.env.NEXT_PUBLIC_API_BASE_URL);  // Tambahkan base URL jika diperlukan
     const key = url.searchParams.get('key');
 
     // Validasi key

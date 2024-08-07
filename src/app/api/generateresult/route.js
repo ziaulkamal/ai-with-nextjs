@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { admin } from '@/app/lib/firebase';
+import { setTimeout } from 'timers/promises';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const trendsRef = admin.database().ref('trends');
@@ -39,7 +40,7 @@ async function querySearchAPI(query) {
   }
 }
 
-export async function generateResult() {
+async function processTrends() {
   try {
     const apiTrends = await fetchTrendsFromAPI();
     const dbTrends = await fetchTrendsFromDB();
@@ -54,19 +55,23 @@ export async function generateResult() {
 
     await updateTrendsInDB(apiTrends);
 
-    return { success: true, message: 'Trends processed successfully.' };
+    console.log('Trends processed successfully.');
   } catch (error) {
-    console.error('Error in generateResult:', error);
-    return { success: false, message: error.message };
+    console.error('Error in processTrends:', error);
   }
 }
 
 export async function GET() {
-  const result = await generateResult();
+  // Start the processing in the background
+  (async () => {
+    processTrends().catch(error => console.error('Error in background processing:', error));
+  })();
+
+  // Respond immediately
   return new Response(
-    JSON.stringify(result),
+    JSON.stringify({ success: true, message: 'Queue Started' }),
     {
-      status: result.success ? 200 : 500,
+      status: 200,
       headers: { 'Content-Type': 'application/json' },
     }
   );
