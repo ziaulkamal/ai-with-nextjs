@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Keyframes for a smooth and beautiful gradient animation */
+@keyframes gradientBackground {
+  0% {
+    background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+  }
+  25% {
+    background: linear-gradient(45deg, #a1c4fd, #c2e9fb);
+  }
+  50% {
+    background: linear-gradient(45deg, #86fde8, #a0c4ff);
+  }
+  75% {
+    background: linear-gradient(45deg, #fbc2eb, #fae3d9);
+  }
+  100% {
+    background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+  }
+}
+
+/* Background animation class with smooth transition */
+.bg-animated-gradient {
+  animation: gradientBackground 900s ease infinite;
+  background-size: 400% 400%;
+  height: 100vh;
+  width: 100%;
+  background-attachment: fixed;
+  transition: background 1s ease-in-out; /* Smooth transition for background changes */
+}
