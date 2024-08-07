@@ -104,7 +104,7 @@ export default function SendToEndpointPage() {
           value={secretKey}
           onChange={(e) => setSecretKey(e.target.value)}
           className="p-2 border border-gray-300 rounded w-full"
-          placeholder="Enter the secret key"
+          placeholder="f667b555-9b4d-43a0-b1e2-0d8843955bb4"
         />
       </div>
       <button
