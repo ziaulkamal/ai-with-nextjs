@@ -1,48 +1,84 @@
-'use client'; // Menandai file ini sebagai komponen client
+'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchData } from '@/app/lib/api'; // Pastikan path ini benar
+import DataTable from 'react-data-table-component';
+import { AiOutlineWarning, AiOutlineCheckCircle } from 'react-icons/ai';
+
+const POLL_INTERVAL = 5000; // Interval polling dalam milidetik (5 detik)
+const PAGE_SIZE = 10; // Jumlah item per halaman
 
 export default function HomePage() {
-  const [data, setData] = useState([]);
+  const [content, setContent] = useState([]);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    async function fetchDataFromAPI() {
-      try {
-        const response = await fetchData();
-        setData(response);
-      } catch (error) {
-        setError('Failed to fetch data');
-        console.error('Failed to fetch data:', error);
+  // Fetch data dari API
+  async function fetchData() {
+    try {
+      const response = await fetch('/api/data');
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
       }
+      const data = await response.json();
+      // Urutkan data berdasarkan status
+      const sortedData = data.sort((a, b) => a.status - b.status);
+      setContent(sortedData);
+    } catch (error) {
+      setError(error.message);
     }
+  }
 
-    fetchDataFromAPI();
+  // Gunakan efek untuk polling data secara berkala
+  useEffect(() => {
+    fetchData(); // Ambil data saat pertama kali dimuat
+
+    const intervalId = setInterval(() => {
+      fetchData(); // Ambil data setiap beberapa detik
+    }, POLL_INTERVAL);
+
+    // Hapus interval saat komponen unmount
+    return () => clearInterval(intervalId);
   }, []);
+
+  if (error) return <div>Error: {error}</div>;
+
+  // Define columns for DataTable
+  const columns = [
+    {
+      name: 'Title',
+      selector: row => row.title,
+      sortable: true,
+    },
+    {
+      name: 'Snippet',
+      selector: row => row.snippet,
+      sortable: true,
+    },
+    {
+      name: 'Status',
+      cell: row => (
+        row.status ? (
+          <AiOutlineCheckCircle className="text-green-500" title="Success" />
+        ) : (
+          <AiOutlineWarning className="text-red-500" title="Warning" />
+        )
+      ),
+      sortable: true,
+    },
+  ];
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Realtime Data</h1>
-      {error && <p className="text-red-500">{error}</p>}
-      <table className="min-w-full bg-white border border-gray-300">
-        <thead>
-          <tr>
-            <th className="border-b px-4 py-2">Title</th>
-            <th className="border-b px-4 py-2">Snippet</th>
-            <th className="border-b px-4 py-2">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item, index) => (
-            <tr key={index}>
-              <td className="border-b px-4 py-2">{item.title}</td>
-              <td className="border-b px-4 py-2">{item.snippet}</td>
-              <td className="border-b px-4 py-2">{item.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <h1 className="text-2xl font-bold mb-4">Content List</h1>
+      <DataTable
+        columns={columns}
+        data={content}
+        pagination
+        paginationPerPage={PAGE_SIZE}
+        paginationRowsPerPageOptions={[PAGE_SIZE]}
+        highlightOnHover
+        striped
+        noDataComponent="No data available"
+      />
     </div>
   );
 }
