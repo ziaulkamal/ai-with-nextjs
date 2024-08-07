@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { AiOutlineWarning, AiOutlineCheckCircle } from 'react-icons/ai';
+import Link from 'next/link'; // Import Link from next
 
 const POLL_INTERVAL = 5000; // Interval polling dalam milidetik (5 detik)
 const DEFAULT_PAGE_SIZE = 10; // Jumlah item per halaman default
@@ -98,6 +99,13 @@ export default function HomePage() {
               ))}
             </select>
           </div>
+          {/* Add a button to navigate to Send-to-Endpoint page */}
+          <Link
+            href="/send-to-endpoint"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Send Data to Endpoint
+          </Link>
         </div>
         <DataTable
           columns={columns}
