@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import axios from 'axios'; // Import Axios
 import DataTable from 'react-data-table-component';
 import { AiOutlineWarning, AiOutlineCheckCircle } from 'react-icons/ai';
 import Link from 'next/link'; // Import Link from next
 
-const POLL_INTERVAL = 5000; // Interval polling dalam milidetik (5 detik)
+const POLL_INTERVAL = 180000; // Interval polling dalam milidetik (3 menit)
 const DEFAULT_PAGE_SIZE = 10; // Jumlah item per halaman default
 
 export default function HomePage() {
@@ -14,16 +15,12 @@ export default function HomePage() {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE); // State untuk menyimpan jumlah item per halaman
   const [expandedRows, setExpandedRows] = useState([]); // State untuk menyimpan baris yang diperluas
 
-  // Fetch data dari API
+  // Fetch data dari API menggunakan Axios
   async function fetchData() {
     try {
-      const response = await fetch('/api/data');
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
-      }
-      const data = await response.json();
+      const response = await axios.get('/api/data');
       // Urutkan data berdasarkan status
-      const sortedData = data.sort((a, b) => a.status - b.status);
+      const sortedData = response.data.sort((a, b) => a.status - b.status);
       setContent(sortedData);
     } catch (error) {
       setError(error.message);
